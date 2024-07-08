@@ -21,6 +21,14 @@ requested `go` subcommand. If the subcommand is `build`, `get` or
 If you specify these flags manually, then they will not be added or
 modified.
 
+## How to install
+
+Open a terminal and run the following:
+
+```
+$ go install github.com/mjwhitta/xgo/cmd/xgo@latest
+```
+
 ## Usage
 
 You can simply use `xgo` in place of `go` or create a shell alias:
@@ -57,14 +65,6 @@ debugging and figured somebody might find it useful someday.
 
 ```
 $ GOOS=windows xgo -d build .
-```
-
-## How to install
-
-Open a terminal and run the following:
-
-```
-$ go install github.com/mjwhitta/xgo/cmd/xgo@latest
 ```
 
 ## Cross-Compilers per host OS
