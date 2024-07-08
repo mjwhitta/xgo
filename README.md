@@ -83,7 +83,7 @@ To compile for Windows (386 and amd64):
 $ brew install mingw-w64
 ```
 
-For Zig support (really *NOT* recommended, doesn't fully work!):
+For Zig support (really **NOT** recommended, doesn't fully work!):
 
 ```
 $ brew install zig
@@ -127,7 +127,7 @@ To compile for Linux (386 and amd64) you will need to install TODO.
 
 To compile for Windows (386) you will need to install TODO.
 
-For Zig support (really *NOT* recommended, leaves all sorts of
+For Zig support (really **NOT** recommended, leaves all sorts of
 artifacts in your binaries):
 
 ```
