@@ -7,6 +7,17 @@ import (
 
 func quote(env string) string {
 	if before, after, ok := strings.Cut(env, "="); ok {
+		// Shouldn't have spaces before equal, must be a value
+		if strings.Contains(before, " ") {
+			return "\"" + strings.ReplaceAll(env, "\"", "\\\"") + "\""
+		}
+
+		// No need to wrap booleans
+		switch after {
+		case "false", "true":
+			return env
+		}
+
 		env = before + "=\"" + after + "\""
 	}
 

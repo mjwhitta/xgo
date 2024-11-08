@@ -25,7 +25,7 @@ func (x *Compiler) debugRun(
 	proc string, enviro []string, args []string,
 ) string {
 	var relevant []string
-	var tmp string
+	var tmp []string
 
 	for _, v := range enviro {
 		if strings.HasPrefix(v, "CC=") ||
@@ -44,17 +44,15 @@ func (x *Compiler) debugRun(
 	}
 
 	for i := range args {
-		args[i] = quote(args[i])
+		tmp = append(tmp, quote(args[i]))
 	}
 
-	tmp = fmt.Sprintf(
+	return fmt.Sprintf(
 		"%s\n%s %s",
 		strings.Join(relevant, "\n"),
 		proc,
-		strings.Join(args, " "),
+		strings.Join(tmp, " "),
 	)
-
-	return tmp
 }
 
 func (x *Compiler) defaultEnv(
