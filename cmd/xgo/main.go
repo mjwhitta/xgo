@@ -72,7 +72,12 @@ func main() {
 
 	// Enable debug, if requested
 	flags.debug = flags.debug || booleanLike("XGODEBUG")
-	x = &xgo.Compiler{Debug: flags.debug, Zig: booleanLike("XGOZIG")}
+	flags.garble = flags.garble || booleanLike("XGOGARBLE")
+	x = &xgo.Compiler{
+		Debug:  flags.debug,
+		Garble: flags.garble,
+		Zig:    booleanLike("XGOZIG"),
+	}
 
 	// Preprocess cli args for some special cases
 	args = xgo.BuildArgsSanityCheck(cli.Args())

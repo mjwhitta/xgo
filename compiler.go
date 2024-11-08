@@ -3,6 +3,7 @@ package xgo
 //go:generate goversioninfo --platform-specific
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -15,11 +16,14 @@ import (
 // Compiler is a struct containing relevant data for cross-compiling
 // Go.
 type Compiler struct {
-	Debug bool
-	Zig   bool
+	Debug  bool
+	Garble bool
+	Zig    bool
 }
 
-func (x *Compiler) debugRun(enviro []string, args []string) string {
+func (x *Compiler) debugRun(
+	proc string, enviro []string, args []string,
+) string {
 	var relevant []string
 	var tmp string
 
@@ -44,8 +48,9 @@ func (x *Compiler) debugRun(enviro []string, args []string) string {
 	}
 
 	tmp = fmt.Sprintf(
-		"%s\ngo %s",
+		"%s\n%s %s",
 		strings.Join(relevant, "\n"),
+		proc,
 		strings.Join(args, " "),
 	)
 
@@ -108,7 +113,22 @@ func (x *Compiler) Run(
 	var cmd *exec.Cmd
 	var e error
 	var enviro []string
-	var tmp string
+	var proc string = "go"
+
+	if x.Garble && (len(args) > 0) && (args[0] == "build") {
+		proc = "garble"
+		args = append(
+			[]string{"--literals", "--seed=random", "--tiny"},
+			args...,
+		)
+
+		for i, arg := range args {
+			if strings.HasSuffix(arg, "-trimpath") {
+				args = append(args[:i], args[i+1:]...)
+				break
+			}
+		}
+	}
 
 	for k, v := range env {
 		enviro = append(enviro, k+"="+v)
@@ -117,18 +137,17 @@ func (x *Compiler) Run(
 	slices.Sort(enviro)
 
 	if x.Debug {
-		return x.debugRun(enviro, args), nil
+		return x.debugRun(proc, enviro, args), nil
 	}
 
-	cmd = exec.Command("go", args...)
+	cmd = exec.Command(proc, args...)
 	cmd.Env = enviro
 
 	if b, e = cmd.Output(); e != nil {
 		switch e := e.(type) {
 		case *exec.ExitError:
-			tmp = strings.TrimSuffix(string(e.Stderr), "\n")
-			if tmp != "" {
-				return "", fmt.Errorf(tmp)
+			if b = bytes.TrimSpace(e.Stderr); len(b) > 0 {
+				return "", fmt.Errorf("%s", b)
 			}
 		default:
 			return "", e

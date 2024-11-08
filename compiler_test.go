@@ -139,13 +139,14 @@ func build(
 	t *testing.T,
 	test compileTest,
 	file string,
+	garble bool,
 	zig bool,
 	pass bool,
 	canSkip bool,
 ) {
 	var e error
 	var env map[string]string
-	var x *xgo.Compiler = &xgo.Compiler{Zig: zig}
+	var x *xgo.Compiler = &xgo.Compiler{Garble: garble, Zig: zig}
 
 	// XGo entry
 	env, e = x.SetupEnv(test.os, test.arch)
@@ -186,65 +187,90 @@ func build(
 }
 
 func TestCompileCGOSupported(t *testing.T) {
+	var src string = "main_cgo.go"
+
 	t.Parallel()
 
 	for _, test := range tests["cgoSupported"] {
 		t.Run(
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
-				build(t, test, "main_cgo.go", false, true, true)
+				build(t, test, src, false, false, true, true)
 			},
 		)
 	}
 }
 
 func TestCompileCGOUnsupported(t *testing.T) {
+	var src string = "main_cgo.go"
+
 	t.Parallel()
 
 	for _, test := range tests["cgoUnsupported"] {
 		t.Run(
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
-				build(t, test, "main_cgo.go", false, false, false)
+				build(t, test, src, false, false, false, false)
 			},
 		)
 	}
 }
 
 func TestCompileCGOZig(t *testing.T) {
+	var src string = "main_cgo.go"
+
 	t.Parallel()
 
 	for _, test := range tests["cgoSupported"] {
 		t.Run(
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
-				build(t, test, "main_cgo.go", true, true, true)
+				build(t, test, src, false, true, true, true)
 			},
 		)
 	}
 }
 
 func TestCompileSupported(t *testing.T) {
+	var src string = "main.go"
+
 	t.Parallel()
 
 	for _, test := range tests["supported"] {
 		t.Run(
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
-				build(t, test, "main.go", false, true, false)
+				build(t, test, src, false, false, true, false)
+			},
+		)
+	}
+}
+
+func TestCompileSupportedWithGarble(t *testing.T) {
+	var src string = "main.go"
+
+	t.Parallel()
+
+	for _, test := range tests["supported"] {
+		t.Run(
+			"GarbleTarget("+test.os+"/"+test.arch+")",
+			func(t *testing.T) {
+				build(t, test, src, true, false, true, false)
 			},
 		)
 	}
 }
 
 func TestCompileUnsupported(t *testing.T) {
+	var src string = "main.go"
+
 	t.Parallel()
 
 	for _, test := range tests["unsupported"] {
 		t.Run(
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
-				build(t, test, "main.go", false, false, false)
+				build(t, test, src, false, false, false, false)
 			},
 		)
 	}

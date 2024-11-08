@@ -24,6 +24,7 @@ const (
 var flags struct {
 	check   bool
 	debug   bool
+	garble  bool
 	goarch  string
 	goos    string
 	nocolor bool
@@ -66,6 +67,7 @@ func init() {
 		"Check for missing toolchains.",
 	)
 	cli.Flag(&flags.debug, "d", "debug", false, "n/a", true)
+	cli.Flag(&flags.garble, "g", "garble", false, "n/a", true)
 	cli.Flag(
 		&flags.goarch,
 		"goarch",
