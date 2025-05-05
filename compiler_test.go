@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"testing"
 
@@ -18,8 +19,21 @@ type compileTest struct {
 	arch string
 }
 
-func (test compileTest) Bin() string {
-	var tmp string = fmt.Sprintf("%s.%s.main", test.os, test.arch)
+func (test compileTest) Bin(fn string, garble bool, zig bool) string {
+	var tmp string = fmt.Sprintf(
+		"%s.%s.%s",
+		strings.TrimSuffix(fn, filepath.Ext(fn)),
+		test.os,
+		test.arch,
+	)
+
+	if garble {
+		tmp += ".garble"
+	}
+
+	if zig {
+		tmp += ".zig"
+	}
 
 	if test.os == "windows" {
 		tmp += ".exe"
@@ -80,6 +94,9 @@ var tests = map[string][]compileTest{
 		{"wasip1", "wasm"},
 		{"windows", "arm"},
 		{"windows", "arm64"},
+	},
+	"garbleUnsupported": {
+		{"wasip1", "wasm"},
 	},
 	"supported": {
 		{"aix", "ppc64"},
@@ -166,7 +183,10 @@ func build(
 	t.Cleanup(
 		func() {
 			os.Remove(
-				filepath.Join("testdata", test.Bin()),
+				filepath.Join(
+					"testdata",
+					test.Bin(file, garble, zig),
+				),
 			)
 		},
 	)
@@ -176,7 +196,7 @@ func build(
 		env,
 		"build",
 		"-o",
-		filepath.Join("testdata", test.Bin()),
+		filepath.Join("testdata", test.Bin(file, garble, zig)),
 		filepath.Join("testdata", file),
 	)
 	if pass {
@@ -252,6 +272,10 @@ func TestCompileSupportedWithGarble(t *testing.T) {
 	t.Parallel()
 
 	for _, test := range tests["supported"] {
+		if slices.Contains(tests["garbleUnsupported"], test) {
+			continue
+		}
+
 		t.Run(
 			"GarbleTarget("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
