@@ -1,3 +1,4 @@
+//nolint:godoclint // These are tests
 package xgo_test
 
 import (
@@ -17,29 +18,6 @@ import (
 type compileTest struct {
 	os   string
 	arch string
-}
-
-func (test compileTest) Bin(fn string, garble bool, zig bool) string {
-	var tmp string = fmt.Sprintf(
-		"%s.%s.%s",
-		strings.TrimSuffix(fn, filepath.Ext(fn)),
-		test.os,
-		test.arch,
-	)
-
-	if garble {
-		tmp += ".garble"
-	}
-
-	if zig {
-		tmp += ".zig"
-	}
-
-	if test.os == "windows" {
-		tmp += ".exe"
-	}
-
-	return tmp
 }
 
 var tests = map[string][]compileTest{
@@ -152,6 +130,29 @@ var tests = map[string][]compileTest{
 	},
 }
 
+func bin(test compileTest, fn string, garble bool, zig bool) string {
+	var tmp string = fmt.Sprintf(
+		"%s.%s.%s",
+		strings.TrimSuffix(fn, filepath.Ext(fn)),
+		test.os,
+		test.arch,
+	)
+
+	if garble {
+		tmp += ".garble"
+	}
+
+	if zig {
+		tmp += ".zig"
+	}
+
+	if test.os == "windows" {
+		tmp += ".exe"
+	}
+
+	return tmp
+}
+
 func build(
 	t *testing.T,
 	test compileTest,
@@ -161,13 +162,24 @@ func build(
 	pass bool,
 	canSkip bool,
 ) {
+	t.Helper()
+
 	var e error
 	var env map[string]string
-	var x *xgo.Compiler = &xgo.Compiler{Garble: garble, Zig: zig}
+	var fn string = filepath.Join(
+		"testdata",
+		bin(test, file, garble, zig),
+	)
+	var x *xgo.Compiler
+
+	if garble {
+		t.Skipf("garble is stupid slow")
+	}
 
 	// XGo entry
+	x = &xgo.Compiler{Garble: garble, Zig: zig}
 	env, e = x.SetupEnv(test.os, test.arch)
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 	assert.NotNil(t, env)
 
 	if canSkip && (env["CC"] != "") {
@@ -182,12 +194,7 @@ func build(
 
 	t.Cleanup(
 		func() {
-			os.Remove(
-				filepath.Join(
-					"testdata",
-					test.Bin(file, garble, zig),
-				),
-			)
+			_ = os.Remove(fn)
 		},
 	)
 
@@ -196,13 +203,13 @@ func build(
 		env,
 		"build",
 		"-o",
-		filepath.Join("testdata", test.Bin(file, garble, zig)),
+		fn,
 		filepath.Join("testdata", file),
 	)
 	if pass {
-		assert.Nil(t, e)
+		assert.NoError(t, e)
 	} else {
-		assert.NotNil(t, e)
+		assert.Error(t, e)
 	}
 }
 
@@ -215,6 +222,7 @@ func TestCompileCGOSupported(t *testing.T) {
 		t.Run(
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
+				t.Parallel()
 				build(t, test, src, false, false, true, true)
 			},
 		)
@@ -230,6 +238,7 @@ func TestCompileCGOUnsupported(t *testing.T) {
 		t.Run(
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
+				t.Parallel()
 				build(t, test, src, false, false, false, false)
 			},
 		)
@@ -245,6 +254,7 @@ func TestCompileCGOZig(t *testing.T) {
 		t.Run(
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
+				t.Parallel()
 				build(t, test, src, false, true, true, true)
 			},
 		)
@@ -260,6 +270,7 @@ func TestCompileSupported(t *testing.T) {
 		t.Run(
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
+				t.Parallel()
 				build(t, test, src, false, false, true, false)
 			},
 		)
@@ -279,6 +290,7 @@ func TestCompileSupportedWithGarble(t *testing.T) {
 		t.Run(
 			"GarbleTarget("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
+				t.Parallel()
 				build(t, test, src, true, false, true, false)
 			},
 		)
@@ -294,6 +306,7 @@ func TestCompileUnsupported(t *testing.T) {
 		t.Run(
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
+				t.Parallel()
 				build(t, test, src, false, false, false, false)
 			},
 		)
@@ -309,10 +322,10 @@ func TestDebug(t *testing.T) {
 	t.Parallel()
 
 	env, e = x.SetupEnv(runtime.GOOS, runtime.GOARCH)
-	assert.Nil(t, e)
+	assert.NoError(t, e)
 	assert.NotNil(t, env)
 
 	stdout, e = x.Run(env, "vet", ".")
-	assert.Nil(t, e)
-	assert.NotEqual(t, "", stdout)
+	assert.NoError(t, e)
+	assert.NotEmpty(t, stdout)
 }

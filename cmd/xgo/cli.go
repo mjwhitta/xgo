@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/mjwhitta/cli"
@@ -36,25 +38,25 @@ func init() {
 	// Configure cli package
 	cli.Align = true // Defaults to false
 	cli.Authors = []string{"Miles Whittaker <mj@whitta.dev>"}
-	cli.Banner = hl.Sprintf(
-		"%s [OPTIONS] <gocommand> [args]",
-		os.Args[0],
-	)
+	cli.Banner = "" +
+		filepath.Base(os.Args[0]) + " [OPTIONS] <gocommand> [args]"
 	cli.BugEmail = "xgo.bugs@whitta.dev"
+
 	cli.ExitStatus(
 		"Normally the exit status is 0. In the event of an error the",
 		"exit status will be one of the below:\n\n",
-		hl.Sprintf("  %d: Invalid option\n", InvalidOption),
-		hl.Sprintf("  %d: Missing option\n", MissingOption),
-		hl.Sprintf("  %d: Invalid argument\n", InvalidArgument),
-		hl.Sprintf("  %d: Missing argument\n", MissingArgument),
-		hl.Sprintf("  %d: Extra argument\n", ExtraArgument),
-		hl.Sprintf("  %d: Exception", Exception),
+		fmt.Sprintf("  %d: Invalid option\n", InvalidOption),
+		fmt.Sprintf("  %d: Missing option\n", MissingOption),
+		fmt.Sprintf("  %d: Invalid argument\n", InvalidArgument),
+		fmt.Sprintf("  %d: Missing argument\n", MissingArgument),
+		fmt.Sprintf("  %d: Extra argument\n", ExtraArgument),
+		fmt.Sprintf("  %d: Exception", Exception),
 	)
 	cli.Info(
 		"This tool aims to simplify cross-compiling Go with or",
 		"without CGO support.",
 	)
+
 	cli.SeeAlso = []string{"gcc", "go", "mingw", "osxcross-git"}
 	cli.Title = "XGo"
 
@@ -103,7 +105,9 @@ func validate() {
 
 	// Short circuit, if version was requested
 	if flags.version {
-		hl.Printf("xgo version %s\n", xgo.Version)
+		fmt.Println(
+			filepath.Base(os.Args[0]) + " version " + xgo.Version,
+		)
 		os.Exit(Good)
 	}
 

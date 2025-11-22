@@ -6,8 +6,5 @@
 /build
 /cover.out
 /local
-/main
-/main_cgo
-/resource_windows*.syso
 /tags
 /vendor

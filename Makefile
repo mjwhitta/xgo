@@ -4,13 +4,8 @@
 clean: clean-default
 ifeq ($(unameS),windows)
 ifneq ($(wildcard resource_windows*.syso),)
-	@remove-item -force ./resource_windows*.syso
+	@remove-item -force ./cmd/xgo/resource_windows*.syso
 endif
 else
-	@rm -f ./resource_windows*.syso
-endif
-
-ifneq ($(unameS),windows)
-spellcheck:
-	@codespell -f -L hilighter -S ".git"
+	@rm -f ./cmd/xgo/resource_windows*.syso
 endif

@@ -1,3 +1,4 @@
+//nolint:godoclint // These are tests
 package xgo_test
 
 import (
@@ -14,6 +15,8 @@ type buildArgsTest struct {
 }
 
 func TestBuildArgsSanityCheck(t *testing.T) {
+	t.Parallel()
+
 	var bld string = "--ldflags=-s -w"
 	var btrim string = "--trimpath"
 	var bvcs string = "--buildvcs=false"
@@ -47,13 +50,14 @@ func TestBuildArgsSanityCheck(t *testing.T) {
 		},
 	}
 
-	t.Parallel()
-
 	for _, test := range tests {
 		t.Run(
 			test.name,
 			func(t *testing.T) {
+				t.Parallel()
+
 				var args []string = xgo.BuildArgsSanityCheck(test.in)
+
 				assert.Equal(t, test.out, args)
 			},
 		)

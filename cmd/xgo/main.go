@@ -1,5 +1,7 @@
 package main
 
+//go:generate goversioninfo --platform-specific
+
 import (
 	"fmt"
 	"os"
@@ -25,9 +27,15 @@ func main() {
 	defer func() {
 		if r := recover(); r != nil {
 			if flags.verbose {
-				panic(r.(error).Error())
+				panic(r)
 			}
-			log.ErrX(Exception, r.(error).Error())
+
+			switch r := r.(type) {
+			case error:
+				log.ErrX(Exception, r.Error())
+			case string:
+				log.ErrX(Exception, r)
+			}
 		}
 	}()
 
@@ -58,7 +66,7 @@ func main() {
 			)
 		}
 
-		os.Exit(Good)
+		return
 	}
 
 	// Get env vars or default to runtime

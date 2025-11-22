@@ -1,7 +1,5 @@
 package xgo
 
-//go:generate goversioninfo --platform-specific
-
 import (
 	"bytes"
 	"encoding/json"
@@ -22,23 +20,31 @@ type Compiler struct {
 }
 
 func (x *Compiler) debugRun(
-	proc string, enviro []string, args []string,
+	proc string,
+	enviro []string,
+	args []string,
 ) string {
+	var keep []string = []string{
+		"CC=",
+		"CGO_ENABLED=",
+		"CXX=",
+		"GOARCH=",
+		"GOOS=",
+	}
 	var relevant []string
 	var tmp []string
 
 	for _, v := range enviro {
-		if strings.HasPrefix(v, "CC=") ||
-			strings.HasPrefix(v, "CGO_ENABLED=") ||
-			strings.HasPrefix(v, "CXX=") ||
-			strings.HasPrefix(v, "GOARCH=") ||
-			strings.HasPrefix(v, "GOOS=") {
+		for i := range keep {
+			if strings.HasPrefix(v, keep[i]) {
+				switch runtime.GOOS {
+				case "windows":
+					relevant = append(relevant, "$env:"+quote(v)+";")
+				default:
+					relevant = append(relevant, quote(v)+" \\")
+				}
 
-			switch runtime.GOOS {
-			case "windows":
-				relevant = append(relevant, "$env:"+quote(v)+";")
-			default:
-				relevant = append(relevant, quote(v)+" \\")
+				break
 			}
 		}
 	}
@@ -56,7 +62,9 @@ func (x *Compiler) debugRun(
 }
 
 func (x *Compiler) defaultEnv(
-	goos string, goarch string, cgo string,
+	goos string,
+	goarch string,
+	cgo string,
 ) (map[string]string, error) {
 	var debug bool
 	var e error
@@ -89,9 +97,8 @@ func (x *Compiler) defaultEnv(
 		return nil, e
 	}
 
-	if e = json.Unmarshal([]byte(stdout), &tmp); e != nil {
-		return nil, e
-	}
+	// Choosing to trust "go env --json" output
+	_ = json.Unmarshal([]byte(stdout), &tmp)
 
 	// Get default env
 	for k, v := range tmp {
@@ -105,7 +112,8 @@ func (x *Compiler) defaultEnv(
 
 // Run will run the go command.
 func (x *Compiler) Run(
-	env map[string]string, args ...string,
+	env map[string]string,
+	args ...string,
 ) (string, error) {
 	var b []byte
 	var cmd *exec.Cmd
@@ -115,6 +123,7 @@ func (x *Compiler) Run(
 
 	if x.Garble && (len(args) > 0) && (args[0] == "build") {
 		proc = "garble"
+
 		args = append(
 			[]string{"--literals", "--seed=random", "--tiny"},
 			args...,
@@ -162,7 +171,8 @@ func (x *Compiler) Run(
 // - GOARCH
 // - GOOS
 func (x *Compiler) SetupEnv(
-	goos string, goarch string,
+	goos string,
+	goarch string,
 ) (map[string]string, error) {
 	var cc string
 	var cgo string = "0"
