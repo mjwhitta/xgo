@@ -160,7 +160,6 @@ func build(
 	garble bool,
 	zig bool,
 	pass bool,
-	canSkip bool,
 ) {
 	t.Helper()
 
@@ -173,7 +172,11 @@ func build(
 	var x *xgo.Compiler
 
 	if garble {
-		t.Skipf("garble is stupid slow")
+		if _, e = exec.LookPath("garble"); e != nil {
+			t.Skip("garble is not installed")
+		}
+
+		t.Skipf("garble is installed, but too slow")
 	}
 
 	// XGo entry
@@ -182,7 +185,7 @@ func build(
 	assert.NoError(t, e)
 	assert.NotNil(t, env)
 
-	if canSkip && (env["CC"] != "") {
+	if env["CC"] != "" {
 		_, e = exec.LookPath(strings.Fields(env["CC"])[0])
 		if e != nil {
 			t.Skipf(
@@ -223,7 +226,7 @@ func TestCompileCGOSupported(t *testing.T) {
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
 				t.Parallel()
-				build(t, test, src, false, false, true, true)
+				build(t, test, src, false, false, true)
 			},
 		)
 	}
@@ -239,7 +242,7 @@ func TestCompileCGOUnsupported(t *testing.T) {
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
 				t.Parallel()
-				build(t, test, src, false, false, false, false)
+				build(t, test, src, false, false, false)
 			},
 		)
 	}
@@ -255,7 +258,7 @@ func TestCompileCGOZig(t *testing.T) {
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
 				t.Parallel()
-				build(t, test, src, false, true, true, true)
+				build(t, test, src, false, true, true)
 			},
 		)
 	}
@@ -271,7 +274,7 @@ func TestCompileSupported(t *testing.T) {
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
 				t.Parallel()
-				build(t, test, src, false, false, true, false)
+				build(t, test, src, false, false, true)
 			},
 		)
 	}
@@ -291,7 +294,7 @@ func TestCompileSupportedWithGarble(t *testing.T) {
 			"GarbleTarget("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
 				t.Parallel()
-				build(t, test, src, true, false, true, false)
+				build(t, test, src, true, false, true)
 			},
 		)
 	}
@@ -307,7 +310,7 @@ func TestCompileUnsupported(t *testing.T) {
 			"Target("+test.os+"/"+test.arch+")",
 			func(t *testing.T) {
 				t.Parallel()
-				build(t, test, src, false, false, false, false)
+				build(t, test, src, false, false, false)
 			},
 		)
 	}
