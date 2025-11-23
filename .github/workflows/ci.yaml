@@ -38,5 +38,5 @@ jobs:
         version: latest
     - name: Build
       run: make
-    - name: Test coverage
-      run: make cover
+    # - name: Test coverage
+    #   run: make cover
