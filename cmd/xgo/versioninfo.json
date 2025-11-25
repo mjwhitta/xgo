@@ -3,13 +3,13 @@
 		"FileVersion": {
 			"Major": 0,
 			"Minor": 3,
-			"Patch": 0,
+			"Patch": 2,
 			"Build": 0
 		},
 		"ProductVersion": {
 			"Major": 0,
 			"Minor": 3,
-			"Patch": 0,
+			"Patch": 2,
 			"Build": 0
 		},
 		"FileFlagsMask": "3f",
@@ -22,14 +22,14 @@
 		"Comments": "",
 		"CompanyName": "Nation-State",
 		"FileDescription": "",
-		"FileVersion": "0.3.0.0",
+		"FileVersion": "0.3.2.0",
 		"InternalName": "xgo",
 		"LegalCopyright": "",
 		"LegalTrademarks": "",
 		"OriginalFilename": "xgo",
 		"PrivateBuild": "",
 		"ProductName": "XGo",
-		"ProductVersion": "0.3.0.0",
+		"ProductVersion": "0.3.2.0",
 		"SpecialBuild": ""
 	},
 	"VarFileInfo": {
