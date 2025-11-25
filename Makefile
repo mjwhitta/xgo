@@ -3,7 +3,7 @@
 
 clean: clean-default
 ifeq ($(unameS),windows)
-ifneq ($(wildcard resource_windows*.syso),)
+ifneq ($(wildcard ./cmd/xgo/resource_windows*.syso),)
 	@remove-item -force ./cmd/xgo/resource_windows*.syso
 endif
 else
