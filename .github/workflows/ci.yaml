@@ -38,5 +38,6 @@ jobs:
         version: latest
     - name: Build
       run: make
+    # Runner missing i386 headers
     # - name: Test coverage
     #   run: make cover
