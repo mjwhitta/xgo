@@ -1,7 +1,7 @@
 package xgo
 
 // Version is the package version.
-const Version = "0.3.5"
+const Version = "0.3.6"
 
 // crossCC is a mapping of GOHOSTOS/GOOS/GOARCH to CC and CXX.
 var crossCC = map[string]map[string]map[string][]string{
