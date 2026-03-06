@@ -40,7 +40,7 @@ var tests = map[string][]compileTest{
 		{"freebsd", "amd64"},
 		{"freebsd", "arm"},
 		{"freebsd", "arm64"},
-		{"freebsd", "riscv64"},
+		{"freebsd", "riscv64"}, // not documented?
 		{"illumos", "amd64"},
 		{"ios", "amd64"},
 		{"ios", "arm64"},
@@ -65,12 +65,13 @@ var tests = map[string][]compileTest{
 		{"openbsd", "arm"},
 		{"openbsd", "arm64"},
 		{"openbsd", "ppc64"},
+		{"openbsd", "riscv64"},
 		{"plan9", "386"},
 		{"plan9", "amd64"},
 		{"plan9", "arm"},
 		{"solaris", "amd64"},
 		{"wasip1", "wasm"},
-		{"windows", "arm"},
+		// {"windows", "arm"}, // no longer supported
 		{"windows", "arm64"},
 	},
 	"garbleUnsupported": {
@@ -86,7 +87,7 @@ var tests = map[string][]compileTest{
 		{"freebsd", "amd64"},
 		{"freebsd", "arm"},
 		{"freebsd", "arm64"},
-		{"freebsd", "riscv64"},
+		{"freebsd", "riscv64"}, // not documented?
 		{"illumos", "amd64"},
 		{"js", "wasm"},
 		{"linux", "386"},
@@ -111,6 +112,7 @@ var tests = map[string][]compileTest{
 		{"openbsd", "arm"},
 		{"openbsd", "arm64"},
 		{"openbsd", "ppc64"},
+		{"openbsd", "riscv64"},
 		{"plan9", "386"},
 		{"plan9", "amd64"},
 		{"plan9", "arm"},
@@ -118,7 +120,7 @@ var tests = map[string][]compileTest{
 		{"wasip1", "wasm"},
 		{"windows", "386"},
 		{"windows", "amd64"},
-		{"windows", "arm"},
+		// {"windows", "arm"}, // no longer supported
 		{"windows", "arm64"},
 	},
 	"unsupported": {

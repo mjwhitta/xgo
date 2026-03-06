@@ -147,6 +147,7 @@ func (x *Compiler) Run(
 		return x.debugRun(proc, enviro, args), nil
 	}
 
+	//nolint:gosec // G204 - That's kinda the point here
 	cmd = exec.Command(proc, args...)
 	cmd.Env = enviro
 
